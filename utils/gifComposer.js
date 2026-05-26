@@ -1,63 +1,98 @@
-const Jimp = require('jimp');
+const sharp = require('sharp');
+const { GifUtil, GifFrame, GifCodec, BitmapImage } = require('gifwrap');
 const axios = require('axios');
 
-// Coordonnées des ronds sur les GIFs (1440x810px)
-// Domicile → logo Vylox à gauche, rond adverse à DROITE
-// Visiteur → logo Vylox à droite, rond adverse à GAUCHE
+// Positions des ronds adverses sur les GIFs (1440x810px)
+// Domicile → Vylox à gauche, rond adverse à DROITE
+// Visiteur → Vylox à droite, rond adverse à GAUCHE
 const POSITIONS = {
-  home: { x: 990, y: 395, r: 115 },  // rond droit (adverse)
-  away: { x: 255, y: 395, r: 115 },  // rond gauche (adverse)
+  home: { cx: 1090, cy: 500, r: 110 },
+  away: { cx: 350,  cy: 500, r: 110 },
 };
 
-/**
- * Télécharge une image depuis une URL et retourne un Buffer
- */
-async function downloadImage(url) {
-  const res = await axios.get(url, { responseType: 'arraybuffer', timeout: 10000 });
+async function downloadBuffer(url) {
+  const res = await axios.get(url, { responseType: 'arraybuffer', timeout: 15000 });
   return Buffer.from(res.data);
 }
 
 /**
- * Compose le logo adverse dans le rond du GIF
- * Retourne un Buffer PNG (frame statique avec logo)
- * Note: Jimp ne supporte pas l'écriture de GIF animé,
- * on envoie donc la première frame en PNG avec le logo collé
+ * Prépare le logo adverse : le resize en cercle, retourne un buffer RGBA PNG
+ */
+async function prepareLogoCircle(logoUrl, radius) {
+  const size     = radius * 2;
+  const logoBuf  = await downloadBuffer(logoUrl);
+
+  // Resize le logo en carré
+  const resized = await sharp(logoBuf)
+    .resize(size, size, { fit: 'cover' })
+    .png()
+    .toBuffer();
+
+  // Créer un masque circulaire SVG
+  const circleMask = `<svg width="${size}" height="${size}">
+    <circle cx="${radius}" cy="${radius}" r="${radius}" fill="white"/>
+  </svg>`;
+
+  // Appliquer le masque circulaire
+  const circular = await sharp(resized)
+    .composite([{ input: Buffer.from(circleMask), blend: 'dest-in' }])
+    .png()
+    .toBuffer();
+
+  return circular;
+}
+
+/**
+ * Compose le logo adverse dans chaque frame du GIF
+ * Retourne un Buffer GIF animé
  */
 async function composeLogo(gifUrl, logoUrl, isHome) {
   try {
     const pos = isHome ? POSITIONS.home : POSITIONS.away;
 
-    // Télécharger le GIF et le logo
-    const [gifBuffer, logoBuffer] = await Promise.all([
-      downloadImage(gifUrl),
-      downloadImage(logoUrl),
-    ]);
+    // Télécharger le GIF
+    const gifBuffer = await downloadBuffer(gifUrl);
 
-    // Charger la première frame du GIF avec Jimp
-    const base = await Jimp.read(gifBuffer);
+    // Préparer le logo en cercle
+    const logoCircle = await prepareLogoCircle(logoUrl, pos.r);
+    const logoSharp  = sharp(logoCircle).raw().toBuffer({ resolveWithObject: true });
+    const { data: logoData, info: logoInfo } = await logoSharp;
 
-    // Charger et redimensionner le logo pour qu'il rentre dans le rond
-    const size   = pos.r * 2;
-    const logo   = await Jimp.read(logoBuffer);
-    logo.resize(size, size);
+    // Lire le GIF
+    const gif = await GifUtil.read(gifBuffer);
 
-    // Créer un masque circulaire
-    const mask = new Jimp(size, size, 0x00000000);
-    for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
-        const cx = x - pos.r, cy = y - pos.r;
-        if (cx * cx + cy * cy <= pos.r * pos.r) {
-          mask.setPixelColor(0xFFFFFFFF, x, y);
-        }
-      }
+    // Composer le logo sur chaque frame
+    const newFrames = [];
+    for (const frame of gif.frames) {
+      // Convertir la frame en buffer PNG via sharp
+      const frameWidth  = frame.bitmap.width;
+      const frameHeight = frame.bitmap.height;
+
+      // frame.bitmap.data est RGBA
+      const frameBuf = await sharp(frame.bitmap.data, {
+        raw: { width: frameWidth, height: frameHeight, channels: 4 }
+      })
+        .composite([{
+          input: logoCircle,
+          left: Math.round(pos.cx - pos.r),
+          top:  Math.round(pos.cy - pos.r),
+        }])
+        .raw()
+        .toBuffer();
+
+      const newBitmap = new BitmapImage(frameWidth, frameHeight, frameBuf);
+      const newFrame  = new GifFrame(newBitmap, {
+        delayCentisecs: frame.delayCentisecs,
+        disposalMethod: frame.disposalMethod,
+      });
+      newFrames.push(newFrame);
     }
-    logo.mask(mask, 0, 0);
 
-    // Coller le logo sur la frame
-    base.composite(logo, pos.x - pos.r, pos.y - pos.r);
+    // Encoder le nouveau GIF
+    const codec    = new GifCodec();
+    const newGif   = await codec.encodeGif(newFrames, { loops: 0 });
+    return newGif.buffer;
 
-    // Retourner en PNG buffer
-    return await base.getBufferAsync(Jimp.MIME_PNG);
   } catch (err) {
     console.error('composeLogo error:', err.message);
     return null;

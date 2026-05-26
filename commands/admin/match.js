@@ -24,44 +24,44 @@ module.exports = {
     if (!await requireAdmin(interaction)) return;
     await interaction.deferReply({ ephemeral: true });
 
-    const isHome   = interaction.options.getString('position') === 'home';
-    const enemy    = interaction.options.getString('adversaire');
-    const logoInput= interaction.options.getString('logo');
-    const date     = interaction.options.getString('date');
-    const roster   = interaction.options.getString('roster');
-    const captain  = interaction.options.getString('captain');
-    const joueur1  = interaction.options.getString('joueur1');
-    const joueur2  = interaction.options.getString('joueur2');
-    const salonOpt = interaction.options.getChannel('salon');
-    const target   = salonOpt || interaction.channel;
+    const isHome    = interaction.options.getString('position') === 'home';
+    const enemy     = interaction.options.getString('adversaire');
+    const logoInput = interaction.options.getString('logo');
+    const date      = interaction.options.getString('date');
+    const roster    = interaction.options.getString('roster');
+    const captain   = interaction.options.getString('captain');
+    const joueur1   = interaction.options.getString('joueur1');
+    const joueur2   = interaction.options.getString('joueur2');
+    const salonOpt  = interaction.options.getChannel('salon');
+    const target    = salonOpt || interaction.channel;
 
     const logoUrl = await resolveLogoSource(logoInput, interaction.guild);
-    if (!logoUrl) return interaction.editReply({ embeds: [error('Logo introuvable', 'Impossible de trouver une image depuis cet ID ou URL.')] });
+    if (!logoUrl) return interaction.editReply({ embeds: [error('Logo introuvable', 'Impossible de trouver une image.')] });
 
-    // Embed infos au-dessus
     const infoEmbed = new EmbedBuilder()
       .setColor(0xFF6BB5)
       .setTitle(`⚔️  Vylox Esport  VS  ${enemy}`)
+      .setThumbnail(logoUrl)
       .addFields(
-        { name: '📅 Date', value: date, inline: true },
-        { name: '🎮 Roster', value: roster, inline: true },
-        { name: '\u200B', value: '\u200B', inline: true },
-        { name: '👑 Captain', value: captain, inline: true },
-        { name: '🎯 Joueur', value: joueur1, inline: true },
-        { name: '🎯 Joueur', value: joueur2, inline: true },
+        { name: '📅 Date',    value: date,     inline: true },
+        { name: '🎮 Roster',  value: roster,   inline: true },
+        { name: '\u200B',     value: '\u200B', inline: true },
+        { name: '👑 Captain', value: captain,  inline: true },
+        { name: '🎯 Joueur',  value: joueur1,  inline: true },
+        { name: '🎯 Joueur',  value: joueur2,  inline: true },
       )
       .setTimestamp();
 
-    // GIF avec logo composé
-    const gifUrl   = getMatchGif(isHome);
-    const composed = await composeLogo(gifUrl, logoUrl, isHome);
+    // Composer le GIF avec le logo dans le rond
+    const gifBuffer = await composeLogo(getMatchGif(isHome), logoUrl, isHome);
 
-    if (composed) {
-      const attachment = new AttachmentBuilder(composed, { name: 'match.png' });
-      const gifEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://match.png');
+    if (gifBuffer) {
+      const attachment = new AttachmentBuilder(gifBuffer, { name: 'match.gif' });
+      const gifEmbed   = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://match.gif');
       await target.send({ content: '@everyone', embeds: [infoEmbed, gifEmbed], files: [attachment] });
     } else {
-      const gifEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(gifUrl).setThumbnail(logoUrl);
+      // Fallback sans composition
+      const gifEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getMatchGif(isHome));
       await target.send({ content: '@everyone', embeds: [infoEmbed, gifEmbed] });
     }
 
