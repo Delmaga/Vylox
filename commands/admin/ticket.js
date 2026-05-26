@@ -90,7 +90,20 @@ module.exports = {
       await interaction.reply({ embeds: [ticketClosed(interaction.user, reason)] });
       updateTicket(interaction.channel.id, { status: 'closed', closed_at: new Date().toISOString() });
       await logTicketClose(interaction, ticket, reason);
-      setTimeout(() => interaction.channel.delete().catch(() => {}), 5000);
+
+      // Renommer le salon en pseudo-raison-closed
+      const closedName = [
+        ticket.user_id ? (await interaction.guild.members.fetch(ticket.user_id).catch(() => null))?.user?.username?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'user' : 'user',
+        reason ? reason.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 20) : 'closed',
+        'closed'
+      ].filter(Boolean).join('-');
+      await interaction.channel.setName(closedName).catch(() => {});
+
+      // Supprimer après 24h
+      const { info } = require('../../utils/embeds');
+      await interaction.followUp({ embeds: [info('Fermeture programmée / Scheduled Closing', '> 🇫🇷 Ce salon sera supprimé dans **24 heures**.
+> 🇺🇸 This channel will be deleted in **24 hours**.')] });
+      setTimeout(() => interaction.channel.delete().catch(() => {}), 24 * 60 * 60 * 1000);
     }
   }
 };

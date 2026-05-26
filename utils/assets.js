@@ -1,6 +1,6 @@
 // URLs Catbox — GIFs Canva de Vylox Esport
 const GIFS = {
-  welcome:          'https://files.catbox.moe/biv4bo.gif',
+  welcome:          'https://files.catbox.moe/avola4.gif',
   tickets:          'https://files.catbox.moe/q7xo6f.gif',
   match_home:       'https://files.catbox.moe/2zcoog.gif',
   match_away:       'https://files.catbox.moe/v0wzud.gif',

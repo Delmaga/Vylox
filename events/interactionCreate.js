@@ -249,7 +249,13 @@ module.exports = {
           ].join('\n'))] }).catch(() => {});
         }
 
-        setTimeout(() => interaction.channel.delete().catch(() => {}), 5000);
+        // Renommer + supprimer après 24h
+        const closedMember = await interaction.guild.members.fetch(ticket.user_id).catch(() => null);
+        const closedName = (closedMember?.user?.username?.toLowerCase().replace(/[^a-z0-9]/g,'') || 'user') + '-closed';
+        await interaction.channel.setName(closedName).catch(() => {});
+        await interaction.followUp({ embeds: [info('Fermeture / Closing', '> 🇫🇷 Suppression dans **24h**.
+> 🇺🇸 Deletion in **24 hours**.')] });
+        setTimeout(() => interaction.channel.delete().catch(() => {}), 24 * 60 * 60 * 1000);
         return;
       }
     }
@@ -289,17 +295,17 @@ async function openTicket(interaction, catId, reason, client) {
 
   const embed = ticketCreated(user, `${catEmoji} ${catLabel}`, reason, config.ticket_ping_role);
   
+  // GIF ticket
+  const { getTicketsGif } = require('../utils/assets');
+  const gifEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getTicketsGif());
 
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('ticket_charge').setLabel('Prendre en charge').setStyle(ButtonStyle.Success).setEmoji('✅'),
-    new ButtonBuilder().setCustomId('ticket_close').setLabel('Fermer le ticket').setStyle(ButtonStyle.Danger).setEmoji('🔒'),
-  );
+  // Ping
+  const pingParts = [`<@${user.id}>`];
+  if (config.ticket_ping_role) pingParts.push(`<@&${config.ticket_ping_role}>`);
 
   await ticketCh.send({
-    content: `<@${user.id}>${config.ticket_ping_role ? ` • <@&${config.ticket_ping_role}>` : ''}`,
-    embeds: [embed],
-    files: [],
-    components: [row],
+    content: pingParts.join(' '),
+    embeds: [gifEmbed, embed],
   });
 
   // Log création

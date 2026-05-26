@@ -41,7 +41,6 @@ module.exports = {
 
     const infoEmbed = new EmbedBuilder().setColor(0xFF6BB5)
       .setTitle(`🎭  Vylox Esport  VS  ${enemy}`)
-      .setThumbnail(logoUrl)
       .addFields(
         { name: '📅 Date',    value: date,     inline: true },
         { name: '🎮 Roster',  value: roster,   inline: true },
@@ -56,8 +55,10 @@ module.exports = {
       const imgEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://showmatch.png');
       await target.send({ content: '@everyone', embeds: [infoEmbed, imgEmbed], files: [att] });
     } else {
-      const imgEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getShowMatchGif(isHome));
-      await target.send({ content: '@everyone', embeds: [infoEmbed, imgEmbed] });
+      const { AttachmentBuilder: AB2 } = require('discord.js');
+      const localImg = new AB2(require('path').join(__dirname, '../../assets', assetName + '.png'), { name: 'showmatch.png' });
+      const imgEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://showmatch.png');
+      await target.send({ content: '@everyone', embeds: [infoEmbed, imgEmbed], files: [localImg] });
     }
     await interaction.editReply({ content: `✅ Showmatch posté dans <#${target.id}> !` });
   }

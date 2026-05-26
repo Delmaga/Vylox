@@ -52,7 +52,6 @@ module.exports = {
 
     const infoEmbed = new EmbedBuilder().setColor(0xFFD700)
       .setTitle(`🏆  Vylox Esport  VS  ${enemy}  |  ${prize}`)
-      .setThumbnail(logoUrl)
       .addFields(
         { name: '📅 Date',    value: date,     inline: true },
         { name: '🎮 Roster',  value: roster,   inline: true },
@@ -67,8 +66,10 @@ module.exports = {
       const imgEmbed = new EmbedBuilder().setColor(0xFFD700).setImage('attachment://cup.png');
       await target.send({ content: '@everyone 🏆', embeds: [infoEmbed, imgEmbed], files: [att] });
     } else {
-      const imgEmbed = new EmbedBuilder().setColor(0xFFD700).setImage(getCupGif(isHome, prize));
-      await target.send({ content: '@everyone 🏆', embeds: [infoEmbed, imgEmbed] });
+      const { AttachmentBuilder: AB2 } = require('discord.js');
+      const localImg = new AB2(require('path').join(__dirname, '../../assets', assetName + '.png'), { name: 'cup.png' });
+      const imgEmbed = new EmbedBuilder().setColor(0xFFD700).setImage('attachment://cup.png');
+      await target.send({ content: '@everyone 🏆', embeds: [infoEmbed, imgEmbed], files: [localImg] });
     }
     await interaction.editReply({ content: `✅ Cup postée dans <#${target.id}> !` });
   }

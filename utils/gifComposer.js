@@ -82,6 +82,8 @@ async function composeLogo(assetName, logoUrl) {
 
   } catch (err) {
     console.error(`composeLogo error (${assetName}):`, err.message);
+    console.error(`  Stack:`, err.stack?.split('\n')[1]);
+    console.error(`  basePath exists:`, require('fs').existsSync(require('path').join(__dirname, '../assets', assetName + '.png')));
     return null;
   }
 }

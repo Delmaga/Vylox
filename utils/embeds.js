@@ -32,7 +32,15 @@ function ticketCreated(user, category, reason, pingRole) {
     );
   if (reason) e.addFields({ name: '📝  Raison', value: reason });
   if (pingRole) e.addFields({ name: '🔔  Équipe notifiée', value: `<@&${pingRole}>` });
-  e.addFields({ name: '━━━━━━━━━━━━━━━━━━━━━', value: '> Notre équipe te répondra **sous 24h**.\n> Décris ton problème avec le maximum de détails.\n> Reste disponible et respectueux.' });
+  e.addFields({ name: '━━━━━━━━━━━━━━━━━━━━━', value: [
+    '> 🇫🇷 Notre équipe te répondra **sous 24h**.',
+    '> Décris ton problème avec un maximum de détails.',
+    '> Reste disponible et respectueux.',
+    '> ',
+    '> 🇺🇸 Our team will respond within **24 hours**.',
+    '> Please describe your issue in as much detail as possible.',
+    '> Stay available and respectful.',
+  ].join('\n') });
   return e;
 }
 
