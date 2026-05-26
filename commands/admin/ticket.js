@@ -102,7 +102,10 @@ async function postPanel(channel, guildId) {
     ? cats.map(c => ({ label: c.label, value: `open_${c.id}`, emoji: c.emoji || '🎫', description: c.description || `Ouvrir un ticket ${c.label}` }))
     : [{ label: 'Support', value: 'open_default', emoji: '🎫', description: 'Ouvrir un ticket support' }];
   const select = new StringSelectMenuBuilder().setCustomId('ticket_open_select').setPlaceholder('⬇  Choisir une catégorie...').addOptions(options);
-  await channel.send({ components: [new ActionRowBuilder().addComponents(select)] });
+  const { EmbedBuilder } = require('discord.js');
+  const { getTicketsGif } = require('../../utils/assets');
+  const panelEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getTicketsGif());
+  await channel.send({ embeds: [panelEmbed], components: [new ActionRowBuilder().addComponents(select)] });
 }
 
 async function logTicketClose(interaction, ticket, reason) {

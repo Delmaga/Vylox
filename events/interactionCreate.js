@@ -185,6 +185,33 @@ module.exports = {
       }
     }
 
+
+    // ── SAY EDIT button → open modal ─────────────────────────
+    if (interaction.isButton() && interaction.customId.startsWith('say_edit_open_')) {
+      const match = interaction.customId.match(/^say_edit_open_(\d+)_(\d+)$/);
+      if (!match) return;
+      const msgId = match[1], channelId = match[2];
+      const ch  = interaction.guild.channels.cache.get(channelId);
+      const msg = await ch?.messages.fetch(msgId).catch(() => null);
+      if (!msg) return interaction.reply({ embeds: [error('Introuvable', 'Message introuvable.')], ephemeral: true });
+
+      const curContent = msg.embeds?.[0]?.description || msg.content || '';
+      const curTitle   = msg.embeds?.[0]?.title || '';
+      const curColor   = msg.embeds?.[0]?.hexColor?.replace('#','') || 'FF6BB5';
+      const curImage   = msg.embeds?.[0]?.image?.url || '';
+
+      const { ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+      const modal = new ModalBuilder().setCustomId(`say_edit_${msgId}_${channelId}`).setTitle('✏️ Modifier le message');
+      modal.addComponents(
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('title').setLabel('Titre').setStyle(TextInputStyle.Short).setRequired(false).setValue(curTitle).setMaxLength(256)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('content').setLabel('Contenu').setStyle(TextInputStyle.Paragraph).setRequired(true).setMaxLength(4000).setValue(curContent)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('color').setLabel('Couleur hex (ex: FF6BB5)').setStyle(TextInputStyle.Short).setRequired(false).setValue(curColor).setMaxLength(7)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('image').setLabel('URL image').setStyle(TextInputStyle.Short).setRequired(false).setValue(curImage).setMaxLength(500)),
+      );
+      await interaction.showModal(modal);
+      return;
+    }
+
     // ── Buttons ─────────────────────────────────────────────────
     if (interaction.isButton()) {
       const id  = interaction.customId;
