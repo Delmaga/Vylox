@@ -7,10 +7,10 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('logs')
     .setDescription('Configurer les salons de logs')
-    .addSubcommand(s => s.setName('vocal').setDescription('Logs vocal').addChannelOption(o => o.setName('salon').addChannelTypes(ChannelType.GuildText).setRequired(true)))
-    .addSubcommand(s => s.setName('message').setDescription('Logs messages').addChannelOption(o => o.setName('salon').addChannelTypes(ChannelType.GuildText).setRequired(true)))
-    .addSubcommand(s => s.setName('tickets').setDescription('Logs tickets').addChannelOption(o => o.setName('salon').addChannelTypes(ChannelType.GuildText).setRequired(true)))
-    .addSubcommand(s => s.setName('moderation').setDescription('Logs modération').addChannelOption(o => o.setName('salon').addChannelTypes(ChannelType.GuildText).setRequired(true))),
+    .addSubcommand(s => s.setName('vocal').setDescription('Logs vocal').addChannelOption(o => o.setName('salon').setDescription('Salon de logs vocal').addChannelTypes(ChannelType.GuildText).setRequired(true)))
+    .addSubcommand(s => s.setName('message').setDescription('Logs messages').addChannelOption(o => o.setName('salon').setDescription('Salon de logs messages').addChannelTypes(ChannelType.GuildText).setRequired(true)))
+    .addSubcommand(s => s.setName('tickets').setDescription('Logs tickets').addChannelOption(o => o.setName('salon').setDescription('Salon de logs tickets').addChannelTypes(ChannelType.GuildText).setRequired(true)))
+    .addSubcommand(s => s.setName('moderation').setDescription('Logs modération').addChannelOption(o => o.setName('salon').setDescription('Salon de logs modération').addChannelTypes(ChannelType.GuildText).setRequired(true))),
 
   async execute(interaction) {
     if (!await requireAdmin(interaction)) return;
