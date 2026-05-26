@@ -52,16 +52,15 @@ module.exports = {
       )
       .setTimestamp();
 
-    // Composer le GIF avec le logo dans le rond
-    const gifBuffer = await composeLogo(getMatchGif(isHome), logoUrl, isHome);
+    const imgBuffer = await composeLogo(getMatchGif(isHome), logoUrl, isHome);
 
-    if (gifBuffer) {
-      const attachment = new AttachmentBuilder(gifBuffer, { name: 'match.gif' });
-      const gifEmbed   = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://match.gif');
-      await target.send({ content: '@everyone', embeds: [infoEmbed, gifEmbed], files: [attachment] });
+    if (imgBuffer) {
+      const attachment = new AttachmentBuilder(imgBuffer, { name: 'match.png' });
+      const imgEmbed   = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://match.png');
+      await target.send({ content: '@everyone', embeds: [infoEmbed, imgEmbed], files: [attachment] });
     } else {
-      const gifEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getMatchGif(isHome));
-      await target.send({ content: '@everyone', embeds: [infoEmbed, gifEmbed] });
+      const imgEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getMatchGif(isHome));
+      await target.send({ content: '@everyone', embeds: [infoEmbed, imgEmbed] });
     }
 
     await interaction.editReply({ content: `✅ Match posté dans <#${target.id}> !` });

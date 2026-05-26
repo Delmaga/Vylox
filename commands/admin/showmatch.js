@@ -52,15 +52,15 @@ module.exports = {
       )
       .setTimestamp();
 
-    const gifBuffer = await composeLogo(getShowMatchGif(isHome), logoUrl, isHome);
+    const imgBuffer = await composeLogo(getShowMatchGif(isHome), logoUrl, isHome);
 
-    if (gifBuffer) {
-      const attachment = new AttachmentBuilder(gifBuffer, { name: 'showmatch.gif' });
-      const gifEmbed   = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://showmatch.gif');
-      await target.send({ content: '@everyone', embeds: [infoEmbed, gifEmbed], files: [attachment] });
+    if (imgBuffer) {
+      const attachment = new AttachmentBuilder(imgBuffer, { name: 'showmatch.png' });
+      const imgEmbed   = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://showmatch.png');
+      await target.send({ content: '@everyone', embeds: [infoEmbed, imgEmbed], files: [attachment] });
     } else {
-      const gifEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getShowMatchGif(isHome));
-      await target.send({ content: '@everyone', embeds: [infoEmbed, gifEmbed] });
+      const imgEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getShowMatchGif(isHome));
+      await target.send({ content: '@everyone', embeds: [infoEmbed, imgEmbed] });
     }
 
     await interaction.editReply({ content: `✅ Showmatch posté dans <#${target.id}> !` });

@@ -1,10 +1,9 @@
 const sharp = require('sharp');
-const { GifUtil, GifFrame, GifCodec, BitmapImage } = require('gifwrap');
 const axios = require('axios');
 
 // Positions des ronds adverses sur les GIFs 1920x1080
-// Domicile → Vylox à gauche, rond adverse à DROITE
-// Visiteur → Vylox à droite, rond adverse à GAUCHE
+// Domicile → rond adverse à DROITE
+// Visiteur → rond adverse à GAUCHE
 const POSITIONS = {
   home: { cx: 1453, cy: 666, r: 146 },
   away: { cx: 466,  cy: 666, r: 146 },
@@ -19,32 +18,27 @@ async function downloadBuffer(url) {
   return Buffer.from(res.data);
 }
 
+/**
+ * Extrait la première frame d'un GIF et colle le logo dans le rond
+ * Retourne un Buffer PNG
+ */
 async function composeLogo(gifUrl, logoUrl, isHome) {
   try {
     const pos  = isHome ? POSITIONS.home : POSITIONS.away;
     const size = pos.r * 2;
+    const left = Math.round(pos.cx - pos.r);
+    const top  = Math.round(pos.cy - pos.r);
 
-    // Télécharger GIF et logo en parallèle
+    // Télécharger en parallèle
     const [gifBuffer, logoBuffer] = await Promise.all([
       downloadBuffer(gifUrl),
       downloadBuffer(logoUrl),
     ]);
 
-    // Lire le GIF
-    const gif = await GifUtil.read(gifBuffer);
-    const frameW = gif.frames[0].bitmap.width;
-    const frameH = gif.frames[0].bitmap.height;
-
-    console.log(`GIF: ${frameW}x${frameH} | Logo pos: cx=${pos.cx}, cy=${pos.cy}, r=${pos.r}`);
-
-    const left = Math.round(pos.cx - pos.r);
-    const top  = Math.round(pos.cy - pos.r);
-
-    // Vérifier les bounds
-    if (left < 0 || top < 0 || left + size > frameW || top + size > frameH) {
-      console.error(`Hors limites: left=${left}, top=${top}, size=${size}, frame=${frameW}x${frameH}`);
-      return null;
-    }
+    // Extraire première frame du GIF → PNG via sharp
+    const framePng = await sharp(gifBuffer, { pages: 1 })
+      .png()
+      .toBuffer();
 
     // Préparer logo circulaire
     const resized = await sharp(logoBuffer)
@@ -61,28 +55,14 @@ async function composeLogo(gifUrl, logoUrl, isHome) {
       .png()
       .toBuffer();
 
-    // Composer sur chaque frame
-    const newFrames = [];
-    for (const frame of gif.frames) {
-      const composed = await sharp(Buffer.from(frame.bitmap.data), {
-        raw: { width: frameW, height: frameH, channels: 4 }
-      })
-        .composite([{ input: logoCircle, left, top }])
-        .raw()
-        .toBuffer();
+    // Coller le logo sur la frame
+    const result = await sharp(framePng)
+      .composite([{ input: logoCircle, left, top }])
+      .png()
+      .toBuffer();
 
-      const bitmap  = new BitmapImage(frameW, frameH, composed);
-      GifUtil.quantizeDekker(bitmap);
-      newFrames.push(new GifFrame(bitmap, {
-        delayCentisecs: frame.delayCentisecs,
-        disposalMethod: frame.disposalMethod,
-      }));
-    }
-
-    const codec  = new GifCodec();
-    const newGif = await codec.encodeGif(newFrames, { loops: 0 });
-    console.log(`GIF composé: ${newGif.buffer.length} bytes`);
-    return newGif.buffer;
+    console.log(`✅ Image composée: ${result.length} bytes`);
+    return result;
 
   } catch (err) {
     console.error('composeLogo error:', err.message);

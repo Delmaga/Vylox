@@ -54,15 +54,15 @@ module.exports = {
       )
       .setTimestamp();
 
-    const gifBuffer = await composeLogo(getCupGif(isHome, prize), logoUrl, isHome);
+    const imgBuffer = await composeLogo(getCupGif(isHome, prize), logoUrl, isHome);
 
-    if (gifBuffer) {
-      const attachment = new AttachmentBuilder(gifBuffer, { name: 'cup.gif' });
-      const gifEmbed   = new EmbedBuilder().setColor(0xFFD700).setImage('attachment://cup.gif');
-      await target.send({ content: '@everyone 🏆', embeds: [infoEmbed, gifEmbed], files: [attachment] });
+    if (imgBuffer) {
+      const attachment = new AttachmentBuilder(imgBuffer, { name: 'cup.png' });
+      const imgEmbed   = new EmbedBuilder().setColor(0xFFD700).setImage('attachment://cup.png');
+      await target.send({ content: '@everyone 🏆', embeds: [infoEmbed, imgEmbed], files: [attachment] });
     } else {
-      const gifEmbed = new EmbedBuilder().setColor(0xFFD700).setImage(getCupGif(isHome, prize));
-      await target.send({ content: '@everyone 🏆', embeds: [infoEmbed, gifEmbed] });
+      const imgEmbed = new EmbedBuilder().setColor(0xFFD700).setImage(getCupGif(isHome, prize));
+      await target.send({ content: '@everyone 🏆', embeds: [infoEmbed, imgEmbed] });
     }
 
     await interaction.editReply({ content: `✅ Cup postée dans <#${target.id}> !` });
