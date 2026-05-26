@@ -46,10 +46,10 @@ module.exports = {
 
       const modal = new ModalBuilder().setCustomId(`say_edit_${msgId}_${targetCh.id}`).setTitle('Modifier le message');
       modal.addComponents(
-        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('title').setLabel('Titre').setStyle(TextInputStyle.Short).setRequired(false).setValue(curTitle)),
-        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('content').setLabel('Contenu').setStyle(TextInputStyle.Paragraph).setRequired(true).setMaxLength(4000).setValue(curContent)),
-        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('color').setLabel('Couleur hex').setStyle(TextInputStyle.Short).setRequired(false).setValue(curColor)),
-        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('image').setLabel('URL image').setStyle(TextInputStyle.Short).setRequired(false).setValue(curImage)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('title').setLabel('Titre').setStyle(TextInputStyle.Short).setRequired(false).setValue(curTitle || '')),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('content').setLabel('Contenu').setStyle(TextInputStyle.Paragraph).setRequired(true).setMaxLength(4000).setValue(curContent || '')),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('color').setLabel('Couleur hex').setStyle(TextInputStyle.Short).setRequired(false).setValue(curColor || '#FF6BB5')),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('image').setLabel('URL image').setStyle(TextInputStyle.Short).setRequired(false).setValue(curImage || '')),
       );
       await interaction.showModal(modal);
     }

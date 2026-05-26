@@ -49,9 +49,10 @@ module.exports = {
 
       // SAY EDIT
       if (id.startsWith('say_edit_')) {
-        const parts     = id.split('_');
-        const msgId     = parts[2];
-        const channelId = parts[3];
+        const match     = id.match(/^say_edit_(\d+)_(\d+)$/);
+        if (!match) return;
+        const msgId     = match[1];
+        const channelId = match[2];
         const title     = interaction.fields.getTextInputValue('title');
         const content   = interaction.fields.getTextInputValue('content');
         const colorHex  = interaction.fields.getTextInputValue('color') || '#FF6BB5';

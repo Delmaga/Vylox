@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { requireAdmin } = require('../../utils/permissions');
-const { competition, error } = require('../../utils/embeds');
+const { error } = require('../../utils/embeds');
 const { getShowMatchGif } = require('../../utils/assets');
 const { resolveLogoSource } = require('../../utils/logoFetcher');
 
@@ -17,17 +17,23 @@ module.exports = {
   async execute(interaction) {
     if (!await requireAdmin(interaction)) return;
     await interaction.deferReply({ ephemeral: true });
+
     const isHome    = interaction.options.getString('position') === 'home';
     const enemy     = interaction.options.getString('adversaire');
     const logoInput = interaction.options.getString('logo');
     const salonOpt  = interaction.options.getChannel('salon');
-    const logoUrl   = await resolveLogoSource(logoInput, interaction.guild);
+
+    const logoUrl = await resolveLogoSource(logoInput, interaction.guild);
     if (!logoUrl) return interaction.editReply({ embeds: [error('Logo introuvable', 'Impossible de trouver une image depuis cet ID ou URL.')] });
-    const embed = competition('showmatch', isHome, enemy, null);
-    embed.setImage(getShowMatchGif(isHome));
-    embed.setThumbnail(logoUrl);
+
+    const embed = new EmbedBuilder()
+      .setColor(0xFF6BB5)
+      .setTitle(`Vylox Esport  VS  ${enemy}`)
+      .setImage(getShowMatchGif(isHome))
+      .setThumbnail(logoUrl);
+
     const target = salonOpt || interaction.channel;
     await target.send({ content: '@everyone', embeds: [embed] });
-    await interaction.editReply({ embeds: [{ color: 0xFF6BB5, description: `✅ Showmatch posté dans <#${target.id}> !` }] });
+    await interaction.editReply({ content: `✅ Showmatch posté dans <#${target.id}> !` });
   }
 };
