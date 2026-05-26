@@ -60,7 +60,6 @@ module.exports = {
       const gifEmbed   = new EmbedBuilder().setColor(0xFF6BB5).setImage('attachment://match.gif');
       await target.send({ content: '@everyone', embeds: [infoEmbed, gifEmbed], files: [attachment] });
     } else {
-      // Fallback sans composition
       const gifEmbed = new EmbedBuilder().setColor(0xFF6BB5).setImage(getMatchGif(isHome));
       await target.send({ content: '@everyone', embeds: [infoEmbed, gifEmbed] });
     }
