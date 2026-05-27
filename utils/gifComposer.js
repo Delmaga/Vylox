@@ -10,20 +10,20 @@ const POSITIONS = {
   // Showmatch: rayon 108px
   'Show_Dom':  { cx: 1266, cy: 563, r: 104 },
   'Show_Vis':  { cx: 423,  cy: 564, r: 104 },
-  // Cup Domicile: rayon 108px
-  'Cup_50_Dom':  { cx: 1266, cy: 564, r: 104 },
-  'Cup_100_Dom': { cx: 1265, cy: 565, r: 104 },
-  'Cup_150_Dom': { cx: 1269, cy: 567, r: 104 },
-  'Cup_200_Dom': { cx: 1268, cy: 564, r: 104 },
-  'Cup_250_Dom': { cx: 1267, cy: 564, r: 104 },
-  'Cup_300_Dom': { cx: 1267, cy: 564, r: 104 },
-  // Cup Visiteur: rayon 108px
-  'Cup_50_Vis':  { cx: 424, cy: 565, r: 104 },
-  'Cup_100_Vis': { cx: 423, cy: 565, r: 104 },
-  'Cup_150_Vis': { cx: 423, cy: 564, r: 104 },
-  'Cup_200_Vis': { cx: 424, cy: 563, r: 104 },
-  'Cup_250_Vis': { cx: 423, cy: 565, r: 104 },
-  'Cup_300_Vis': { cx: 422, cy: 564, r: 104 },
+  // Cup Domicile: Vylox à gauche, adverse à DROITE
+  'Cup_50_Dom':  { cx: 1263, cy: 564, r: 133 },
+  'Cup_100_Dom': { cx: 1263, cy: 565, r: 133 },
+  'Cup_150_Dom': { cx: 1265, cy: 567, r: 133 },
+  'Cup_200_Dom': { cx: 1264, cy: 564, r: 133 },
+  'Cup_250_Dom': { cx: 1263, cy: 564, r: 133 },
+  'Cup_300_Dom': { cx: 1263, cy: 564, r: 133 },
+  // Cup Visiteur: Vylox à droite, adverse à GAUCHE
+  'Cup_50_Vis':  { cx: 422, cy: 570, r: 133 },
+  'Cup_100_Vis': { cx: 422, cy: 570, r: 133 },
+  'Cup_150_Vis': { cx: 422, cy: 570, r: 133 },
+  'Cup_200_Vis': { cx: 422, cy: 570, r: 133 },
+  'Cup_250_Vis': { cx: 422, cy: 570, r: 133 },
+  'Cup_300_Vis': { cx: 422, cy: 570, r: 133 },
 };
 
 const ASSETS = path.join(__dirname, '../assets');
