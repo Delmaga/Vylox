@@ -21,7 +21,6 @@ const client = new Client({
 client.commands = new Collection();
 initDatabase();
 loadCommands(client);
-client.removeAllListeners(); // Eviter les doublons
 loadEvents(client);
 
 client.once('ready', async () => {
