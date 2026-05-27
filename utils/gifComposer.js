@@ -4,26 +4,26 @@ const path  = require('path');
 
 // Coordonnées des ronds détectées pixel par pixel sur chaque image
 const POSITIONS = {
-  // Match: rayon 139px
-  'Match_Dom': { cx: 1264, cy: 569, r: 135 },
-  'Match_Vis': { cx: 422,  cy: 566, r: 135 },
-  // Showmatch: rayon 108px
-  'Show_Dom':  { cx: 1266, cy: 563, r: 104 },
-  'Show_Vis':  { cx: 423,  cy: 564, r: 104 },
-  // Cup Domicile: Vylox à gauche, adverse à DROITE
-  'Cup_50_Dom':  { cx: 1263, cy: 564, r: 133 },
-  'Cup_100_Dom': { cx: 1263, cy: 565, r: 133 },
-  'Cup_150_Dom': { cx: 1265, cy: 567, r: 133 },
-  'Cup_200_Dom': { cx: 1264, cy: 564, r: 133 },
-  'Cup_250_Dom': { cx: 1263, cy: 564, r: 133 },
-  'Cup_300_Dom': { cx: 1263, cy: 564, r: 133 },
-  // Cup Visiteur: Vylox à droite, adverse à GAUCHE
-  'Cup_50_Vis':  { cx: 422, cy: 570, r: 133 },
-  'Cup_100_Vis': { cx: 422, cy: 570, r: 133 },
-  'Cup_150_Vis': { cx: 422, cy: 570, r: 133 },
-  'Cup_200_Vis': { cx: 422, cy: 570, r: 133 },
-  'Cup_250_Vis': { cx: 422, cy: 570, r: 133 },
-  'Cup_300_Vis': { cx: 422, cy: 570, r: 133 },
+  // Match: Dom=adverse gauche, Vis=adverse droite
+  'Match_Dom': { cx: 422,  cy: 566, r: 135 },
+  'Match_Vis': { cx: 1264, cy: 569, r: 135 },
+  // Showmatch: Dom=adverse gauche, Vis=adverse droite
+  'Show_Dom':  { cx: 423,  cy: 564, r: 104 },
+  'Show_Vis':  { cx: 1266, cy: 563, r: 104 },
+  // Cup Domicile: rond adverse à GAUCHE (cx=422)
+  'Cup_50_Dom':  { cx: 422, cy: 570, r: 133 },
+  'Cup_100_Dom': { cx: 422, cy: 570, r: 133 },
+  'Cup_150_Dom': { cx: 422, cy: 570, r: 133 },
+  'Cup_200_Dom': { cx: 422, cy: 570, r: 133 },
+  'Cup_250_Dom': { cx: 422, cy: 570, r: 133 },
+  'Cup_300_Dom': { cx: 422, cy: 570, r: 133 },
+  // Cup Visiteur: rond adverse à DROITE (cx=1263)
+  'Cup_50_Vis':  { cx: 1263, cy: 564, r: 133 },
+  'Cup_100_Vis': { cx: 1263, cy: 565, r: 133 },
+  'Cup_150_Vis': { cx: 1265, cy: 567, r: 133 },
+  'Cup_200_Vis': { cx: 1264, cy: 564, r: 133 },
+  'Cup_250_Vis': { cx: 1263, cy: 564, r: 133 },
+  'Cup_300_Vis': { cx: 1263, cy: 564, r: 133 },
 };
 
 const ASSETS = path.join(__dirname, '../assets');
