@@ -253,8 +253,7 @@ module.exports = {
         const closedMember = await interaction.guild.members.fetch(ticket.user_id).catch(() => null);
         const closedName = (closedMember?.user?.username?.toLowerCase().replace(/[^a-z0-9]/g,'') || 'user') + '-closed';
         await interaction.channel.setName(closedName).catch(() => {});
-        await interaction.followUp({ embeds: [info('Fermeture / Closing', '> 🇫🇷 Suppression dans **24h**.
-> 🇺🇸 Deletion in **24 hours**.')] });
+        await interaction.followUp({ embeds: [info('Fermeture / Closing', '> FR: Suppression dans **24h**.\n> EN: Deletion in **24 hours**.')] });
         setTimeout(() => interaction.channel.delete().catch(() => {}), 24 * 60 * 60 * 1000);
         return;
       }
