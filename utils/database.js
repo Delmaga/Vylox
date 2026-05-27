@@ -20,6 +20,7 @@ function initDatabase() {
       log_message TEXT,
       log_tickets TEXT,
       log_moderation TEXT,
+      log_lien TEXT,
       twitch_url TEXT,
       twitch_image TEXT,
       website_url TEXT,
@@ -48,6 +49,23 @@ function initDatabase() {
       taken_by TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       closed_at DATETIME
+    );
+
+    CREATE TABLE IF NOT EXISTS lien_config (
+      guild_id TEXT NOT NULL,
+      channel_id TEXT NOT NULL,
+      enabled INTEGER DEFAULT 0,
+      PRIMARY KEY (guild_id, channel_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS vocal_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      guild_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      channel_id TEXT NOT NULL,
+      joined_at INTEGER NOT NULL,
+      left_at INTEGER,
+      duration INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS bypass (
@@ -95,9 +113,40 @@ function isBypassed(guildId, userId, roleIds = []) {
 }
 function getBypassList(guildId) { return db.prepare('SELECT * FROM bypass WHERE guild_id=?').all(guildId); }
 
+// Lien config
+function setLienConfig(guildId, channelId, enabled) {
+  db.prepare('INSERT OR REPLACE INTO lien_config (guild_id, channel_id, enabled) VALUES (?, ?, ?)').run(guildId, channelId, enabled ? 1 : 0);
+}
+function getLienConfig(guildId, channelId) {
+  return db.prepare('SELECT * FROM lien_config WHERE guild_id=? AND channel_id=?').get(guildId, channelId);
+}
+function isLienEnabled(guildId, channelId) {
+  const row = getLienConfig(guildId, channelId);
+  return row ? row.enabled === 1 : true; // Par défaut activé
+}
+
+// Vocal sessions
+function startVocalSession(guildId, userId, channelId) {
+  db.prepare('INSERT INTO vocal_sessions (guild_id, user_id, channel_id, joined_at) VALUES (?, ?, ?, ?)').run(guildId, userId, channelId, Date.now());
+}
+function endVocalSession(guildId, userId, channelId) {
+  const session = db.prepare('SELECT * FROM vocal_sessions WHERE guild_id=? AND user_id=? AND channel_id=? AND left_at IS NULL ORDER BY joined_at DESC LIMIT 1').get(guildId, userId, channelId);
+  if (session) {
+    const duration = Math.floor((Date.now() - session.joined_at) / 1000);
+    db.prepare('UPDATE vocal_sessions SET left_at=?, duration=? WHERE id=?').run(Date.now(), duration, session.id);
+    return { ...session, duration };
+  }
+  return null;
+}
+function getVocalSession(guildId, userId) {
+  return db.prepare('SELECT * FROM vocal_sessions WHERE guild_id=? AND user_id=? AND left_at IS NULL ORDER BY joined_at DESC LIMIT 1').get(guildId, userId);
+}
+
 module.exports = {
   initDatabase, getConfig, setConfig,
   getTicketCategories, addTicketCategory, editTicketCategory, deleteTicketCategory,
   createTicket, getTicket, updateTicket,
   addBypass, removeBypass, isBypassed, getBypassList,
+  setLienConfig, getLienConfig, isLienEnabled,
+  startVocalSession, endVocalSession, getVocalSession,
 };

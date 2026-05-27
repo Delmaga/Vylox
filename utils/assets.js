@@ -40,4 +40,12 @@ function getCupGif(isHome, priceStr) {
   return isHome ? GIFS.cup.home[best] : GIFS.cup.away[best];
 }
 
-module.exports = { getMatchGif, getShowMatchGif, getCupGif, getWelcomeGif, getTicketsGif, getLogo };
+function getLogMessageGif()    { return 'https://files.catbox.moe/b0cw5x.gif'; }
+function getLogVocalGif()      { return 'https://files.catbox.moe/wu0m94.gif'; }
+function getLogRoleGif()       { return 'https://files.catbox.moe/64amcs.gif'; }
+function getLogPermGif()       { return 'https://files.catbox.moe/rsifa7.gif'; }
+function getLogSalonGif()      { return 'https://files.catbox.moe/0wkq1m.gif'; }
+function getLogCategoryGif()   { return 'https://files.catbox.moe/vcl7pu.gif'; }
+function getLogLienGif()       { return 'https://files.catbox.moe/g1a6k3.gif'; }
+
+module.exports = { getMatchGif, getShowMatchGif, getCupGif, getWelcomeGif, getTicketsGif, getLogo, getLogMessageGif, getLogVocalGif, getLogRoleGif, getLogPermGif, getLogSalonGif, getLogCategoryGif, getLogLienGif };

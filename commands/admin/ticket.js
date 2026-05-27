@@ -128,13 +128,23 @@ async function logTicketClose(interaction, ticket, reason) {
   if (!config.log_tickets) return;
   const logCh = interaction.guild.channels.cache.get(config.log_tickets);
   if (!logCh) return;
-  const { info } = require('../../utils/embeds');
-  await logCh.send({ embeds: [info(`Ticket #${ticket.id} fermé`, [
-    `> 👤 Utilisateur : <@${ticket.user_id}>`,
-    `> 📂 Catégorie : ${ticket.category}`,
-    `> 🔒 Fermé par : <@${interaction.user.id}>`,
-    reason ? `> 📝 Raison : ${reason}` : '',
-  ].filter(Boolean).join('\n'))] });
+  const { EmbedBuilder } = require('discord.js');
+  const now = Math.floor(Date.now()/1000);
+  const openAt = Math.floor(new Date(ticket.created_at).getTime()/1000);
+  const embed = new EmbedBuilder()
+    .setColor(0xFF2244)
+    .setTitle('🔒  Ticket fermé')
+    .addFields(
+      { name: '👤 Utilisateur',   value: `<@${ticket.user_id}>`, inline: true },
+      { name: '🔒 Fermé par',     value: `<@${interaction.user.id}>`, inline: true },
+      { name: '📂 Catégorie',     value: ticket.category, inline: true },
+      { name: '🕐 Ouvert le',     value: `<t:${openAt}:F>`, inline: true },
+      { name: '🕐 Fermé le',      value: `<t:${now}:F>`, inline: true },
+    )
+    .setTimestamp();
+  if (ticket.taken_by) embed.addFields({ name: '✅ Pris en charge par', value: `<@${ticket.taken_by}>`, inline: true });
+  if (reason) embed.addFields({ name: '📝 Raison', value: reason });
+  await logCh.send({ embeds: [embed] });
 }
 
 module.exports.postPanel = postPanel;
