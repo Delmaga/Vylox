@@ -101,8 +101,10 @@ module.exports = {
 
       // Supprimer après 24h
       const { info } = require('../../utils/embeds');
-      await interaction.followUp({ embeds: [info('Fermeture programmée / Scheduled Closing', '> 🇫🇷 Ce salon sera supprimé dans **24 heures**.
-> 🇺🇸 This channel will be deleted in **24 hours**.')] });
+      await interaction.followUp({ embeds: [info('Fermeture / Closing', [
+        '> Ce salon sera supprime dans **24 heures**.',
+        '> This channel will be deleted in **24 hours**.',
+      ].join('\n'))] });
       setTimeout(() => interaction.channel.delete().catch(() => {}), 24 * 60 * 60 * 1000);
     }
   }
